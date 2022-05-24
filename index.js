@@ -44,6 +44,15 @@ const run = async () => {
     const itemsCollections = client.db("toolkit").collection("items");
     const blogsCollections = client.db("toolkit").collection("blogs");
     const ordersCollections = client.db("toolkit").collection("orders");
+
+    // Issuing JWT TOKEN
+    app.post("/login", async (req, res) => {
+      const { email } = req.body;
+      const token = jwt.sign({ email }, process.env.SECRET, {
+        expiresIn: "1h",
+      });
+      res.send({ token });
+    });
   } catch (err) {
     console.error(err);
   } finally {
