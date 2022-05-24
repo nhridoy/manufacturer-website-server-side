@@ -53,6 +53,16 @@ const run = async () => {
       });
       res.send({ token });
     });
+
+    // Upserting User
+    app.put("/user", async (req, res) => {
+      const user = req.body;
+      const filter = { email: user.email };
+      const options = { upsert: true };
+      const update = { $set: user };
+      const result = await usersCollections.updateOne(filter, update, options);
+      res.send(result);
+    });
   } catch (err) {
     console.error(err);
   } finally {
