@@ -63,6 +63,12 @@ const run = async () => {
       const result = await usersCollections.updateOne(filter, update, options);
       res.send(result);
     });
+
+    // All Users
+    app.get("/users", verifyJWTToken, async (req, res) => {
+      const users = await usersCollections.find().toArray();
+      res.send(users);
+    });
   } catch (err) {
     console.error(err);
   } finally {
