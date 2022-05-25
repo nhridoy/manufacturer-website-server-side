@@ -156,11 +156,11 @@ const run = async () => {
       const result = await reviewsCollections.insertOne(review);
       res.send(result);
     });
-    // // All Reviews
-    // app.get("/reviews", async (req, res) => {
-    //   const reviews = await reviewsCollections.find().toArray();
-    //   res.send(reviews);
-    // });
+    // All Reviews
+    app.get("/reviews", async (req, res) => {
+      const reviews = await reviewsCollections.find().toArray();
+      res.send(reviews);
+    });
   } catch (err) {
     console.error(err);
   } finally {
