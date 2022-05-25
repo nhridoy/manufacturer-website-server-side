@@ -170,7 +170,6 @@ const run = async () => {
     // Create Intent
     app.post("/create-payment-intent", async (req, res) => {
       const items = req.body;
-      console.log(items);
       const price = items.price * 100;
 
       // Create a PaymentIntent with the order amount and currency
@@ -179,12 +178,10 @@ const run = async () => {
         currency: "usd",
         payment_method_types: ["card"],
       });
-      console.log(paymentIntent.client_secret);
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
     });
-    // Update My Order
 
     // Cancel My Order
     app.delete("/orders/me/:id", verifyJWTToken, async (req, res) => {
@@ -198,6 +195,42 @@ const run = async () => {
       const order = await ordersCollections.findOne({ _id: ObjectId(id) });
       res.send(order);
     });
+
+    // Order Paid Update
+    app.patch("/orders/:id", verifyJWTToken, async (req, res) => {
+      const { id } = req.params;
+      const payment = req.body;
+      const result = await ordersCollections.updateOne(
+        { _id: ObjectId(id) },
+        {
+          $set: {
+            paid: true,
+            transactionId: payment.transactionId,
+            status: "pending",
+          },
+        }
+      );
+      res.send(result);
+    });
+
+    // Order Status Update
+    app.patch(
+      "/updateOrders/:id",
+      verifyJWTToken,
+      verifyAdmin,
+      async (req, res) => {
+        const { id } = req.params;
+        const result = await ordersCollections.updateOne(
+          { _id: ObjectId(id) },
+          {
+            $set: {
+              status: "shipped",
+            },
+          }
+        );
+        res.send(result);
+      }
+    );
 
     // Create Blog
     app.post("/blogs", verifyJWTToken, verifyAdmin, async (req, res) => {
