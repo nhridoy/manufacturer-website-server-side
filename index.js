@@ -119,6 +119,13 @@ const run = async () => {
         res.send(result);
       }
     );
+
+    // Create Blog
+    app.post("/blogs", verifyJWTToken, verifyAdmin, async (req, res) => {
+      const blog = req.body;
+      const result = await blogsCollections.insertOne(blog);
+      res.send(result);
+    });
   } catch (err) {
     console.error(err);
   } finally {
