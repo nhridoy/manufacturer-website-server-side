@@ -44,6 +44,7 @@ const run = async () => {
     const itemsCollections = client.db("toolkit").collection("items");
     const blogsCollections = client.db("toolkit").collection("blogs");
     const ordersCollections = client.db("toolkit").collection("orders");
+    const reviewsCollections = client.db("toolkit").collection("reviews");
 
     // Verify Admin Middleware
     const verifyAdmin = async (req, res, next) => {
@@ -137,6 +138,29 @@ const run = async () => {
       const result = await blogsCollections.deleteOne({ _id: ObjectId(id) });
       res.send(result);
     });
+    // Get Blog
+    app.get("/blogs/:id", async (req, res) => {
+      const { id } = req.params;
+      const blog = await blogsCollections.findOne({ _id: ObjectId(id) });
+      res.send(blog);
+    });
+
+    // Create Review
+    app.post("/reviews", verifyJWTToken, async (req, res) => {
+      const { email } = req.authData;
+
+      const user = await usersCollections.findOne({ email });
+
+      const review = req.body;
+      review.user = user;
+      const result = await reviewsCollections.insertOne(review);
+      res.send(result);
+    });
+    // // All Reviews
+    // app.get("/reviews", async (req, res) => {
+    //   const reviews = await reviewsCollections.find().toArray();
+    //   res.send(reviews);
+    // });
   } catch (err) {
     console.error(err);
   } finally {
