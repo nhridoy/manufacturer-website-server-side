@@ -28,15 +28,6 @@ const verifyJWTToken = (req, res, next) => {
   }
 };
 
-// Verify Admin Middleware
-const verifyAdmin = (req, res, next) => {
-  if (req.authData.role === "admin") {
-    next();
-  } else {
-    res.sendStatus(403);
-  }
-};
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.l6osu.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
@@ -54,6 +45,17 @@ const run = async () => {
     const blogsCollections = client.db("toolkit").collection("blogs");
     const ordersCollections = client.db("toolkit").collection("orders");
 
+    // Verify Admin Middleware
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.authData.email;
+      const user = await usersCollections.findOne({ email });
+      if (user.role === "admin") {
+        next();
+      } else {
+        res.sendStatus(403);
+      }
+    };
+
     // Issuing JWT TOKEN
     app.post("/login", async (req, res) => {
       const { email } = req.body;
@@ -66,7 +68,6 @@ const run = async () => {
     // Upserting User
     app.put("/user", async (req, res) => {
       const user = req.body;
-      console.log(user);
       const filter = { email: user.email };
       const options = { upsert: true };
       const update = { $set: user };
@@ -75,19 +76,32 @@ const run = async () => {
     });
 
     // Make Admin
-    app.put("/user/admin", verifyJWTToken, async (req, res) => {
+    app.put("/user/admin", verifyJWTToken, verifyAdmin, async (req, res) => {
       const { email } = req.body;
-      console.log(email);
       const filter = { email };
       const update = { $set: { role: "admin" } };
       const result = await usersCollections.updateOne(filter, update);
       res.send(result);
     });
 
+    // Check Admin
+    app.get("/user/admin", verifyJWTToken, async (req, res) => {
+      const { email } = req.authData;
+      const result = await usersCollections.findOne({ email });
+      res.send(result?.role === "admin");
+    });
+
     // All Users
     app.get("/users", verifyJWTToken, async (req, res) => {
       const users = await usersCollections.find().toArray();
       res.send(users);
+    });
+
+    // Create Item
+    app.post("/products", verifyJWTToken, verifyAdmin, async (req, res) => {
+      const item = req.body;
+      const result = await itemsCollections.insertOne(item);
+      res.send(result);
     });
   } catch (err) {
     console.error(err);
