@@ -131,12 +131,12 @@ const run = async () => {
       const blogs = await blogsCollections.find().toArray();
       res.send(blogs);
     });
-    // // Delete Blog
-    // app.delete("/blogs/:id", verifyJWTToken, verifyAdmin, async (req, res) => {
-    //   const { id } = req.params;
-    //   const result = await blogsCollections.deleteOne({ _id: ObjectId(id) });
-    //   res.send(result);
-    // });
+    // Delete Blog
+    app.delete("/blogs/:id", verifyJWTToken, verifyAdmin, async (req, res) => {
+      const { id } = req.params;
+      const result = await blogsCollections.deleteOne({ _id: ObjectId(id) });
+      res.send(result);
+    });
   } catch (err) {
     console.error(err);
   } finally {
