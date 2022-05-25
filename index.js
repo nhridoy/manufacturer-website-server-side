@@ -28,6 +28,15 @@ const verifyJWTToken = (req, res, next) => {
   }
 };
 
+// Verify Admin Middleware
+const verifyAdmin = (req, res, next) => {
+  if (req.authData.role === "admin") {
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+};
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.l6osu.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
@@ -62,6 +71,16 @@ const run = async () => {
       const options = { upsert: true };
       const update = { $set: user };
       const result = await usersCollections.updateOne(filter, update, options);
+      res.send(result);
+    });
+
+    // Make Admin
+    app.put("/user/admin", verifyJWTToken, async (req, res) => {
+      const { email } = req.body;
+      console.log(email);
+      const filter = { email };
+      const update = { $set: { role: "admin" } };
+      const result = await usersCollections.updateOne(filter, update);
       res.send(result);
     });
 
