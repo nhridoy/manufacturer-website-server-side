@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -108,6 +108,17 @@ const run = async () => {
       const items = await itemsCollections.find().toArray();
       res.send(items);
     });
+    // Delete Item
+    app.delete(
+      "/products/:id",
+      verifyJWTToken,
+      verifyAdmin,
+      async (req, res) => {
+        const { id } = req.params;
+        const result = await itemsCollections.deleteOne({ _id: ObjectId(id) });
+        res.send(result);
+      }
+    );
   } catch (err) {
     console.error(err);
   } finally {
