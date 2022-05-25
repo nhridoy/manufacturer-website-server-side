@@ -103,6 +103,11 @@ const run = async () => {
       const result = await itemsCollections.insertOne(item);
       res.send(result);
     });
+    // All Items
+    app.get("/products", async (req, res) => {
+      const items = await itemsCollections.find().toArray();
+      res.send(items);
+    });
   } catch (err) {
     console.error(err);
   } finally {
