@@ -169,18 +169,23 @@ const run = async () => {
 
     // Create Intent
     app.post("/create-payment-intent", async (req, res) => {
-      const items = req.body;
-      const price = items.price * 100;
+      try {
+        const items = req.body;
+        const price = items.price * 100;
 
-      // Create a PaymentIntent with the order amount and currency
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: price,
-        currency: "usd",
-        payment_method_types: ["card"],
-      });
-      res.send({
-        clientSecret: paymentIntent.client_secret,
-      });
+        // Create a PaymentIntent with the order amount and currency
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: price,
+          currency: "usd",
+          payment_method_types: ["card"],
+        });
+        res.send({
+          clientSecret: paymentIntent.client_secret,
+        });
+      } catch (error) {
+        console.error(error);
+        res.send({ error: error.message });
+      }
     });
 
     // Cancel My Order
