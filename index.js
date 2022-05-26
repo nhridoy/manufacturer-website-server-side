@@ -140,6 +140,13 @@ const run = async () => {
       res.send(orders);
     });
 
+    // My Orders
+    app.get("/orders/me", verifyJWTToken, async (req, res) => {
+      const { email } = req.authData;
+      const orders = await ordersCollections.find({ email }).toArray();
+      res.send(orders);
+    });
+
     // Create Blog
     app.post("/blogs", verifyJWTToken, verifyAdmin, async (req, res) => {
       const blog = req.body;
