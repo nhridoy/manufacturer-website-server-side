@@ -109,6 +109,12 @@ const run = async () => {
       const items = await itemsCollections.find().toArray();
       res.send(items);
     });
+    // Single Item
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const item = await itemsCollections.findOne({ _id: ObjectId(id) });
+      res.send(item);
+    });
     // Delete Item
     app.delete(
       "/products/:id",
