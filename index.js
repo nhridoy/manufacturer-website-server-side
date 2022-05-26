@@ -166,11 +166,19 @@ const run = async () => {
       res.send(orders);
     });
 
+    // Update My Order
+
     // Cancel My Order
     app.delete("/orders/me/:id", verifyJWTToken, async (req, res) => {
       const { id } = req.params;
       const result = await ordersCollections.deleteOne({ _id: ObjectId(id) });
       res.send(result);
+    });
+    // Get Order Info
+    app.get("/orders/:id", async (req, res) => {
+      const { id } = req.params;
+      const order = await ordersCollections.findOne({ _id: ObjectId(id) });
+      res.send(order);
     });
 
     // Create Blog
