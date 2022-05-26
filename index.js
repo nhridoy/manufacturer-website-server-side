@@ -76,6 +76,25 @@ const run = async () => {
       res.send(result);
     });
 
+    // My Profile
+    app.get("/users/me", verifyJWTToken, async (req, res) => {
+      const email = req.authData.email;
+      const user = await usersCollections.findOne({ email });
+      res.send(user);
+    });
+
+    // Update My Profile
+    app.patch("/users/me", verifyJWTToken, async (req, res) => {
+      const userEmail = req.authData.email;
+      const { name, email, country, phone } = req.body;
+      const update = { $set: { name, country, phone, email } };
+      const result = await usersCollections.updateOne(
+        { email: userEmail },
+        update
+      );
+      res.send(result);
+    });
+
     // Make Admin
     app.put("/user/admin", verifyJWTToken, verifyAdmin, async (req, res) => {
       const { email } = req.body;
