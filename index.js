@@ -127,6 +127,13 @@ const run = async () => {
       }
     );
 
+    // Purchasing an Item
+    app.post("/purchase", verifyJWTToken, async (req, res) => {
+      const body = req.body;
+      const result = await ordersCollections.insertOne(body);
+      res.send(result);
+    });
+
     // Create Blog
     app.post("/blogs", verifyJWTToken, verifyAdmin, async (req, res) => {
       const blog = req.body;
