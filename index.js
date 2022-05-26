@@ -147,6 +147,13 @@ const run = async () => {
       res.send(orders);
     });
 
+    // Cancel My Order
+    app.delete("/orders/me/:id", verifyJWTToken, async (req, res) => {
+      const { id } = req.params;
+      const result = await ordersCollections.deleteOne({ _id: ObjectId(id) });
+      res.send(result);
+    });
+
     // Create Blog
     app.post("/blogs", verifyJWTToken, verifyAdmin, async (req, res) => {
       const blog = req.body;
